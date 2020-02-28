@@ -34,7 +34,8 @@ CREATE TABLE `amazon_bestsellers` (
   `browse_node` varchar(20) NOT NULL DEFAULT '',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (source_code, asin)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -47,7 +48,7 @@ DROP TABLE IF EXISTS `amazon_category`;
 CREATE TABLE `amazon_category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `source_code` varchar(20) NOT NULL,
-  `category_name` varchar(500) NOT NULL,
+  `category_name` varchar(500) NOT NULL UNIQUE,
   `category_url` varchar(500) NOT NULL,
   `category_level` int(11) NOT NULL,
   `category_status` int(11) NOT NULL,
@@ -89,7 +90,8 @@ CREATE TABLE `amazon_product` (
   `failed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (source_code, asin)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

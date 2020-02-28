@@ -103,7 +103,15 @@ class Category {
                 const seller_links = [];
                 const product_links = [];
 
-                for (let i = 0; i < nodes.length; i++) {
+                // for test, this part must be deleted in production mode
+                var loopcounter = 0;
+                if (nodes.length > 2) {
+                    loopcounter = 2;
+                } else {
+                    loopcounter = nodes.length;
+                }
+
+                for (let i = 0; i < loopcounter; i++) {
                     const it = nodes[i];
                     const element = it.querySelector('span.zg-item > a');
 
@@ -240,8 +248,8 @@ class Category {
                 password: this.config.PROXY_PASS,
             });
             await page.setViewport({
-                width: 1200,
-                height: 900
+                width: 800,
+                height: 600
             });
             await page.setDefaultNavigationTimeout(120000);
             await page.exposeFunction('getSourceCode', this.getSourceCode);
@@ -261,14 +269,22 @@ class Category {
             arr.push(this.db_category_list[i].id);
         }
 
-        await this.db.updateStatus(this.connection, this.config.TABLE_NAME_CATEGORY, arr, this.config.STATUS_RESERVED);
-
+        if (this.db_category_list.length !== 0)
+            await this.db.updateStatus(this.connection, this.config.TABLE_NAME_CATEGORY, arr, this.config.STATUS_RESERVED);
 
         if (this.db_category_list == 0) {
             this.db_category_list = [];
+
             for (let i = 0; i < this.max_worker_count; i++) {
-                this.page_list[i].close();
-                this.browse_list[i].close();
+                try {
+                    this.page_list[i].close().then(() => {
+                        console.log('+++ browser close +++');
+                        if (this.browse_list[i])
+                            this.browse_list[i].close();
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
             }
 
             this.connection.end();
@@ -351,10 +367,10 @@ class Category {
 
         q.empty = () => {
             console.log('~~~~~~~~ empty ~~~~~~~~~', q.running(), that.getDateTime());
-            const workerList = q.workersList();
-            for (let t = 0; t < workerList.length; t++) {
-                console.log(workerList[t].data.db_item.category_name);
-            }
+            // const workerList = q.workersList();
+            // for (let t = 0; t < workerList.length; t++) {
+            //     console.log('~~~~~~~~ workerList ~~~~~~~~~', workerList[t].data.db_item.category_name);
+            // }
         };
 
         for (let i = 0; i < this.db_category_list.length; i++) {

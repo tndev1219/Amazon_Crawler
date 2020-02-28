@@ -22,6 +22,17 @@ class DB {
 
     }
 
+    updateCategory(connection, category_name, category_level) {
+        return new Promise(function (resolve, reject) {
+            const query = `UPDATE  amazon_category SET category_level = '${category_level}' WHERE category_name = '${category_name}'`;
+            connection.query(query, function (error, results, fields) {
+                if (error) reject(error);
+
+                resolve(results);
+            });
+        });
+    }
+
     updateStatus(connection, table_name, ids, status) {
         let date_update = '';
         if (status == CONFIG.STATUS_RESERVED) {
@@ -67,12 +78,12 @@ class DB {
 
             let values_str = arr.join(",");
 
-            arr = [];
-            key_list.forEach(key => {
-                arr.push('??');
-            });
+            // arr = [];
+            // key_list.forEach(key => {
+            //     arr.push('??');
+            // });
 
-            let insert_into_str = arr.join(",");
+            // let insert_into_str = arr.join(",");
 
             arr = [];
             key_list.forEach(key => {

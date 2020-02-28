@@ -50,8 +50,8 @@ class Category {
             password: this.config.PROXY_PASS,
         });
         await page.setViewport({
-            width: 1200,
-            height: 900
+            width: 800,
+            height: 600
         });
         await page.setDefaultNavigationTimeout(120000);
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36');
@@ -118,8 +118,8 @@ class Category {
             db_item.category_status == this.config.CATEGORY_SCRAPED);
 
         if (found_item) {
-            // console.log('///////////////////')
-            // console.log(found_item)
+            // console.log('///////////////////');
+            // console.log(found_item);
             return [];
         }
 
@@ -142,7 +142,16 @@ class Category {
             const d_time = await getDateTime();
 
             const links = [];
-            for (let i = 0; i < nodes.length; i++) {
+
+            // for test, must delete this part
+            var loopcount = 0;
+            if (nodes.length > 2) {
+                loopcount = 2;
+            } else {
+                loopcount = nodes.length;
+            }
+
+            for (let i = 0; i < loopcount; i++) {
                 const item = nodes[i];
                 const href_link = item.getAttribute('href');
                 const href_text = item.innerText;
@@ -228,7 +237,6 @@ class Category {
                         const rank = it.querySelector('.zg-badge-text').innerText;
 
                         let href_link = element.getAttribute('href');
-                        const href_text = element.innerText;
 
                         const reg = /\/\/(.*?)\//g;
                         const domain = reg.exec(item.category_url)[1];
@@ -254,7 +262,6 @@ class Category {
                             'asin': await getAsin(href_link),
                             'url': href_link,
                             'rank': parseInt(rank.replace('#', '')),
-                            'status': 0,
                             'browse_node': await getBrowseNode(item.category_url),
                             'created_at': d_time,
                             'updated_at': d_time,

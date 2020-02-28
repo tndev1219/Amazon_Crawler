@@ -3,6 +3,7 @@ const Config = {
     TABLE_NAME_PRODUCT: "amazon_product",
     TABLE_NAME_SELLER: "amazon_bestsellers",
     CATEGORY_SCRAPED: 1,
+    MODE_INIT: "init",
     MODE_CATEGORY: "category",
     MODE_PRODUCT: "product",
 
@@ -22,8 +23,8 @@ const Config = {
     /************ Dev ************/
     // DB_HOST: 'localhost',
     // DB_USER: 'root',
-    // DB_PASSWORD: 'dnflgmlakd888',
-    // DB_NAME: 'amazon_best_seller',
+    // DB_PASSWORD: '',
+    // DB_NAME: 'amazon_bestsellers',
 
     // PROXY: 'zproxy.lum-superproxy.io:22225',
     // PROXY_USER: 'lum-customer-pricefy-zone-static',
@@ -31,10 +32,10 @@ const Config = {
     /************ Dev ************/
 
     /************ Production ************/
-    DB_HOST: 'laravel.ciwrdpuezei5.us-west-2.rds.amazonaws.com',
-    DB_USER: 'laravel',
-    DB_PASSWORD: 'AoQBRLo023',
-    DB_NAME: 'amazon_bestsellers',
+    DB_HOST: 'ls-a95546ac23693821685dd2ea26488d2c0c6de569.ckgtmtqtf3zi.us-east-1.rds.amazonaws.com',
+    DB_USER: 'aliexpress',
+    DB_PASSWORD: 'r.8}Xbh;mTZU]Ypr=hEL8KqL2UIA&cjo',
+    DB_NAME: 'amazon-bestseller',
 
     PROXY: '127.0.0.1:24000',
     //PROXY_USER: 'lum-customer-pricefy-zone-static',

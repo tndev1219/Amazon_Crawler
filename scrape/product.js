@@ -250,9 +250,9 @@ class Product {
         if ((this.result_list.length > this.config.MAX_DB_INSERT_COUNT) || is_last) {
             // console.log(JSON.stringify(this.result_list, null, '\t'));
             if (this.result_list.length > 0) {
-                const isnert_result = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, this.result_list);
+                const insert_result = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, this.result_list);
 
-                if (isnert_result) {
+                if (insert_result) {
                     const arr = [];
 
                     for (let t = 0; t < this.result_list.length; t++) {
@@ -323,8 +323,8 @@ class Product {
                 password: this.config.PROXY_PASS,
             });
             await page.setViewport({
-                width: 1200,
-                height: 900
+                width: 800,
+                height: 600
             });
             await page.setDefaultNavigationTimeout(120000);
             this.page_list.push(page);
@@ -339,13 +339,22 @@ class Product {
             arr.push(this.db_product_list[i].id);
         }
 
-        await this.db.updateStatus(this.connection, this.config.TABLE_NAME_PRODUCT, arr, this.config.STATUS_RESERVED);
+        if (this.db_product_list.length !== 0)
+            await this.db.updateStatus(this.connection, this.config.TABLE_NAME_PRODUCT, arr, this.config.STATUS_RESERVED);
 
         if (this.db_product_list == 0) {
             this.db_product_list = [];
+
             for (let i = 0; i < this.max_worker_count; i++) {
-                this.page_list[i].close();
-                this.browse_list[i].close();
+                try {
+                    this.page_list[i].close().then(() => {
+                        console.log('+++ browser close +++');
+                        if (this.browse_list[i])
+                            this.browse_list[i].close();
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
             }
 
             this.connection.end();
@@ -421,11 +430,11 @@ class Product {
 
         q.empty = () => {
             console.log('~~~~~~~~ empty ~~~~~~~~~', q.running(), that.getDateTime());
-            const workerList = q.workersList();
+            // const workerList = q.workersList();
 
-            for (let t = 0; t < workerList.length; t++) {
-                console.log(workerList[t].data.db_item.asin);
-            }
+            // for (let t = 0; t < workerList.length; t++) {
+            //     console.log(workerList[t].data.db_item.asin);
+            // }
         };
 
 
