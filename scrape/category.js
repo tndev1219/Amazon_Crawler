@@ -93,7 +93,9 @@ class Category {
 
         if (!item) return false;
 
-        for (let pageNo = 0; pageNo < 2; pageNo++) {
+        // for test, must delete this line in production mode
+        for (let pageNo = 0; pageNo < 1; pageNo++) {
+        // for (let pageNo = 0; pageNo < 2; pageNo++) {
             const url = `${item.category_url}?pg=${pageNo + 1}`;
 
             await page.goto(url);
@@ -186,7 +188,7 @@ class Category {
             }, item);
             // console.log('item=', pageNo, item.category_name, result[1].length)
             try {
-                const res = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, result[1]);
+                let res = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, result[1]);
                 if (res) {
                     await this.db.insertRecords(connection, this.config.TABLE_NAME_SELLER, result[0]);
                 }
@@ -240,18 +242,19 @@ class Category {
                     '--ignore-certificate-errors',
                     '--disable-setuid-sandbox',
                     `--proxy-server=${this.config.PROXY}`
-                ]
+                ],
+                timeout: 60000
             });
             const page = await browser.newPage();
-            await page.authenticate({
-                username: this.config.PROXY_USER,
-                password: this.config.PROXY_PASS,
-            });
+            // await page.authenticate({
+            //     username: this.config.PROXY_USER,
+            //     password: this.config.PROXY_PASS,
+            // });
             await page.setViewport({
                 width: 800,
                 height: 600
             });
-            await page.setDefaultNavigationTimeout(120000);
+            await page.setDefaultNavigationTimeout(600000);
             await page.exposeFunction('getSourceCode', this.getSourceCode);
             await page.exposeFunction('getDateTime', this.getDateTime);
             await page.exposeFunction('getBrowseNode', this.getBrowseNode);

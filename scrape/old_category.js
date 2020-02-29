@@ -15,10 +15,10 @@ class Category {
         this.config = CONFIG;
         this.start_urls = [
             'https://www.amazon.com/Best-Sellers/zgbs/',
-            'https://www.amazon.it/gp/bestsellers/',
-            'https://www.amazon.es/bestsellers',
-            'https://www.amazon.fr/bestsellers',
-            'https://www.amazon.de/bestsellers',
+            // 'https://www.amazon.it/gp/bestsellers/',
+            // 'https://www.amazon.es/bestsellers',
+            // 'https://www.amazon.fr/bestsellers',
+            // 'https://www.amazon.de/bestsellers',
         ];
     }
 
@@ -42,18 +42,19 @@ class Category {
                 '--ignore-certificate-errors',
                 '--disable-setuid-sandbox',
                 `--proxy-server=${this.config.PROXY}`
-            ]
+            ],
+            timeout: 60000
         });
         const page = await browser.newPage();
-        await page.authenticate({
-            username: this.config.PROXY_USER,
-            password: this.config.PROXY_PASS,
-        });
+        // await page.authenticate({
+        //     username: this.config.PROXY_USER,
+        //     password: this.config.PROXY_PASS,
+        // });
         await page.setViewport({
             width: 800,
             height: 600
         });
-        await page.setDefaultNavigationTimeout(120000);
+        await page.setDefaultNavigationTimeout(600000);
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36');
 
         return {
@@ -114,8 +115,7 @@ class Category {
         const db_category_list = await this.db.getRecords(connection, this.config.TABLE_NAME_CATEGORY);
         let found_item = db_category_list.find(db_item =>
             db_item.category_name == item.category_name &&
-            db_item.category_level == item.category_level &&
-            db_item.category_status == this.config.CATEGORY_SCRAPED);
+            db_item.category_level == item.category_level);
 
         if (found_item) {
             // console.log('///////////////////');
@@ -143,7 +143,7 @@ class Category {
 
             const links = [];
 
-            // for test, must delete this part
+            // for test, must delete this part in production mode
             var loopcount = 0;
             if (nodes.length > 2) {
                 loopcount = 2;
@@ -194,16 +194,6 @@ class Category {
             if ((db_category_list.length == 0) || (db_category_list.length != category_links.length))
                 isBool = false;
 
-            for (let c_item of category_links) {
-                found_item = db_category_list.find(db_item =>
-                    db_item.category_name == c_item.category_name &&
-                    db_item.category_level == c_item.category_level &&
-                    db_item.category_status == 0);
-
-                if (found_item)
-                    isBool = false;
-            }
-
             if (isBool == true) { // all sub categoreis are scraped before
                 // console.log('******* all sub is done *********')
                 return null;
@@ -220,7 +210,9 @@ class Category {
 
         if (!item) return [];
 
-        for (let i = 0; i < 2; i++) {
+        // for test, must delete this line in product mode
+        for (let i = 0; i < 1; i++) {
+        // for (let i = 0; i < 2; i++) {
             const url = `${item.category_url}?pg=${i + 1}`;
 
             await page.goto(url);
@@ -229,7 +221,15 @@ class Category {
                 const seller_links = [];
                 const product_links = [];
 
-                for (let i = 0; i < nodes.length; i++) {
+                // for test, must delete this part in production mode
+                var loopcount = 0;
+                if (nodes.length > 2) {
+                    loopcount = 2;
+                } else {
+                    loopcount = nodes.length;
+                }
+
+                for (let i = 0; i < loopcount; i++) {
                     const it = nodes[i];
                     const element = it.querySelector('span.zg-item > a');
 
@@ -273,7 +273,7 @@ class Category {
             }, item);
 
             try {
-                const res = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, result[1]);
+                let res = await this.db.insertRecords(connection, this.config.TABLE_NAME_PRODUCT, result[1]);
                 if (res)
                     await this.db.insertRecords(connection, this.config.TABLE_NAME_SELLER, result[0]);
             } catch (e) { }

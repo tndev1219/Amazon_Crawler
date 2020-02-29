@@ -78,13 +78,6 @@ class DB {
 
             let values_str = arr.join(",");
 
-            // arr = [];
-            // key_list.forEach(key => {
-            //     arr.push('??');
-            // });
-
-            // let insert_into_str = arr.join(",");
-
             arr = [];
             key_list.forEach(key => {
                 if (key == 'category_status') {
@@ -113,7 +106,6 @@ class DB {
             let query = mysql.format(insertQuery, values);
             connection.query(query, (err, response) => {
                 if (err) {
-                    // console.error(err);
                     resolve(false);
                 }
 

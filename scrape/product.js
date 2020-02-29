@@ -315,18 +315,19 @@ class Product {
                     '--ignore-certificate-errors',
                     '--disable-setuid-sandbox',
                     `--proxy-server=${this.config.PROXY}`
-                ]
+                ],
+                timeout: 60000
             });
             const page = await browser.newPage();
-            await page.authenticate({
-                username: this.config.PROXY_USER,
-                password: this.config.PROXY_PASS,
-            });
+            // await page.authenticate({
+            //     username: this.config.PROXY_USER,
+            //     password: this.config.PROXY_PASS,
+            // });
             await page.setViewport({
                 width: 800,
                 height: 600
             });
-            await page.setDefaultNavigationTimeout(120000);
+            await page.setDefaultNavigationTimeout(600000);
             this.page_list.push(page);
             this.browse_list.push(browser);
         }
