@@ -314,19 +314,17 @@ class Product {
                     '--disable-web-security',
                     '--ignore-certificate-errors',
                     '--disable-setuid-sandbox',
-                    `--proxy-server=${this.config.PROXY}`
+                    `--proxy-server=${this.config.PROXY}`,
+                    '--disable-gl-drawing-for-tests',
+                    '--enable-low-res-tiling',
+                    '--fast-start',
+                    '--virtual-time-budget=10000'
                 ],
-                timeout: 60000
+                timeout: 60000,
+                ignoreHTTPSErrors: true
             });
             const page = await browser.newPage();
-            // await page.authenticate({
-            //     username: this.config.PROXY_USER,
-            //     password: this.config.PROXY_PASS,
-            // });
-            await page.setViewport({
-                width: 800,
-                height: 600
-            });
+
             await page.setDefaultNavigationTimeout(600000);
             this.page_list.push(page);
             this.browse_list.push(browser);

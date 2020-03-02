@@ -46,14 +46,7 @@ class Category {
             timeout: 60000
         });
         const page = await browser.newPage();
-        // await page.authenticate({
-        //     username: this.config.PROXY_USER,
-        //     password: this.config.PROXY_PASS,
-        // });
-        await page.setViewport({
-            width: 800,
-            height: 600
-        });
+
         await page.setDefaultNavigationTimeout(600000);
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36');
 
@@ -115,7 +108,8 @@ class Category {
         const db_category_list = await this.db.getRecords(connection, this.config.TABLE_NAME_CATEGORY);
         let found_item = db_category_list.find(db_item =>
             db_item.category_name == item.category_name &&
-            db_item.category_level == item.category_level);
+            db_item.category_level == item.category_level &&
+            db_item.category_status == this.config.CATEGORY_SCRAPED);
 
         if (found_item) {
             // console.log('///////////////////');
@@ -128,6 +122,7 @@ class Category {
         const category_links = await page.evaluate(async (level) => {
             let nodes = null;
             if (level == 1) {
+
                 nodes = document.querySelectorAll("ul#zg_browseRoot ul li a");
             } else {
                 const selected_item = document.querySelector("ul#zg_browseRoot ul li span.zg_selected");
@@ -143,15 +138,7 @@ class Category {
 
             const links = [];
 
-            // for test, must delete this part in production mode
-            var loopcount = 0;
-            if (nodes.length > 2) {
-                loopcount = 2;
-            } else {
-                loopcount = nodes.length;
-            }
-
-            for (let i = 0; i < loopcount; i++) {
+            for (let i = 0; i < nodes.length; i++) {
                 const item = nodes[i];
                 const href_link = item.getAttribute('href');
                 const href_text = item.innerText;
@@ -194,8 +181,18 @@ class Category {
             if ((db_category_list.length == 0) || (db_category_list.length != category_links.length))
                 isBool = false;
 
+            for (let c_item of category_links) {
+                found_item = db_category_list.find(db_item =>
+                    db_item.category_name == c_item.category_name &&
+                    db_item.category_level == c_item.category_level &&
+                    db_item.category_status == 0);
+
+                if (found_item)
+                    isBool = false;
+            }
+
             if (isBool == true) { // all sub categoreis are scraped before
-                // console.log('******* all sub is done *********')
+                console.log('******* all sub is done *********')
                 return null;
             } else {
                 await this.db.insertRecords(connection, this.config.TABLE_NAME_CATEGORY, category_links);
@@ -210,9 +207,7 @@ class Category {
 
         if (!item) return [];
 
-        // for test, must delete this line in product mode
-        for (let i = 0; i < 1; i++) {
-        // for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 2; i++) {
             const url = `${item.category_url}?pg=${i + 1}`;
 
             await page.goto(url);
@@ -221,15 +216,7 @@ class Category {
                 const seller_links = [];
                 const product_links = [];
 
-                // for test, must delete this part in production mode
-                var loopcount = 0;
-                if (nodes.length > 2) {
-                    loopcount = 2;
-                } else {
-                    loopcount = nodes.length;
-                }
-
-                for (let i = 0; i < loopcount; i++) {
+                for (let i = 0; i < nodes.length; i++) {
                     const it = nodes[i];
                     const element = it.querySelector('span.zg-item > a');
 

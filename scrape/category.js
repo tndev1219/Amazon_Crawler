@@ -93,9 +93,7 @@ class Category {
 
         if (!item) return false;
 
-        // for test, must delete this line in production mode
-        for (let pageNo = 0; pageNo < 1; pageNo++) {
-        // for (let pageNo = 0; pageNo < 2; pageNo++) {
+        for (let pageNo = 0; pageNo < 2; pageNo++) {
             const url = `${item.category_url}?pg=${pageNo + 1}`;
 
             await page.goto(url);
@@ -105,15 +103,7 @@ class Category {
                 const seller_links = [];
                 const product_links = [];
 
-                // for test, this part must be deleted in production mode
-                var loopcounter = 0;
-                if (nodes.length > 2) {
-                    loopcounter = 2;
-                } else {
-                    loopcounter = nodes.length;
-                }
-
-                for (let i = 0; i < loopcounter; i++) {
+                for (let i = 0; i < nodes.length; i++) {
                     const it = nodes[i];
                     const element = it.querySelector('span.zg-item > a');
 
@@ -246,14 +236,7 @@ class Category {
                 timeout: 60000
             });
             const page = await browser.newPage();
-            // await page.authenticate({
-            //     username: this.config.PROXY_USER,
-            //     password: this.config.PROXY_PASS,
-            // });
-            await page.setViewport({
-                width: 800,
-                height: 600
-            });
+
             await page.setDefaultNavigationTimeout(600000);
             await page.exposeFunction('getSourceCode', this.getSourceCode);
             await page.exposeFunction('getDateTime', this.getDateTime);
